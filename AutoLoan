@@ -1,1 +1,164 @@
 
+/******************************************************************
+This program will calculate a user's monthly car payment based
+on several user-defined parameters. 
+The overall program structure consists of:
+Declarations and initializations
+Input price of vehicle
+Input trade-in value
+Input down payment 
+Input annual interest rate
+Calculation of monthly loan payments
+Output display
+Author: Alec Alderman
+*******************************************************************/
+
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <cmath>
+using namespace std;
+
+
+/* 1. getPrice() gets the price of the vehicle from the user. 	
+The input must be between the values of 50 and 50,000.*/
+
+float getPrice()
+{
+    float price;
+	//The user is asked for the price; if the input is invalid, the while loop repeats until valid input is given. 
+    do 
+	{
+        cout << "Input the price of the vehicle (between $50 and $50,000): " << endl;
+        cin >> price;
+	} while (!(price > 50.00 && price < 50000.00));
+    return price;
+}
+
+
+/* 2. getTradeIn() gets the trade in value of the user's  
+current vehicle.*/
+
+float getTradeIn(float price)
+{
+    float tradeIn;
+	do 
+	{
+		cout << "Input the trade-in value of your current vehicle: " << endl;
+		cin >> tradeIn; 
+	} while (!(tradeIn >= 0.00 && tradeIn < price));
+    return tradeIn;
+}
+
+
+/* getDownPayment() gets the value of the initial down payment
+from the user, and checks to make sure it is both greater than 0
+and lesser than the total price minus the trade-in value.*/
+
+float getDownPayment(float price, float tradeIn)
+{
+	float downPayment;
+    do 
+	{
+        cout << "Input down payment in dollars and cents:" << endl;
+        cin >> downPayment;
+	} while (!(downPayment >= 0.00 && downPayment < (price - tradeIn)));
+    return downPayment;
+}
+
+/* getInterestRate() gets the interest rate charged on the loan from the user.
+The interest rate must be expressed as a decimal (0.06 rather than 6%),
+and it must be greater than 0 but lesser than 0.5*/
+
+float getInterestRate()
+{ 
+	float annualIntRate;
+    do {
+        cout << "Input the annual interest rate as a decimal fraction (greater than 0.0 and less than 0.50):" << endl;
+        cin >> annualIntRate;
+	} while (!(annualIntRate >= 0 && annualIntRate < 0.50));
+    return annualIntRate;
+}
+
+
+//calcMonPayment 	
+//You are to use the monPayment equation as the basis of a function to calculate the monthly payment amount.  
+//You are to calculate a monthly payment based upon 24, 36, 48, and 60 months. 
+//The four monthly payments are to be stored in a one-dimensional array.  
+//This function is to use return by value.  
+
+float calcMonPayment(int noMonths, float loanAmt, float monIntRate)
+{    
+    float monPayment = (loanAmt * monIntRate) / (1.0 - pow((1 + monIntRate), -noMonths));
+    return monPayment;
+}
+
+
+/*displayLoanSchedule displays all of the information
+calculated by the program to the user in an easily readable format.  
+A for loop is to be used to display the four monthly payments.  
+This is a void function, since it is only printing to the console.*/
+void displayLoanSchedule (float price, float tradeIn, float downPayment,float loanAmt,
+        float annualIntPercent, float monPayment[])
+{
+    //Output results
+    cout << fixed << setprecision(2) << "Honest Dave's Used Cars \t" << endl;
+    cout << fixed << setprecision(2) << "Vehicle Price \t\t" << price << endl;
+    cout << fixed << setprecision(2) << "Trade in Value \t\t" << tradeIn << endl;
+    cout << fixed << setprecision(2) << "Down Payment \t\t" << downPayment << endl;
+    cout << fixed << setprecision(4) << "-----------------------------------" << endl;
+    cout << fixed << setprecision(2) << "Loan Amount \t\t" << loanAmt << endl;
+    cout << fixed << setprecision(2) << "Annual interest rate\t" << annualIntPercent << "%" << endl;
+    cout << fixed << setprecision(2) << "Monthly payment options\t" << loanAmt << endl;
+    
+    for(int i = 0; i < 4;i++)
+	{
+        cout << fixed << setprecision(2) << (24 + i * 12) << " months " << monPayment[i] << endl;        
+    }
+}
+
+int main() 
+{
+    float price; //Price of vehicle
+    float downPayment; //Down Payment
+    float tradeIn; //Trade in for vehicle
+    float loanAmt; //Loan Amount (calculated)
+    float annualIntRate; //Annual Interest Rate (fraction) 
+    float annualIntPercent; //Annual Interest Rate (percent) 
+    float monIntRate; //Monthly Interest Rate (fraction)
+    int noMonths; //Number of Monthly Payments (24, 36, 48 & 60)
+    float monPayment[4]; //Monthly Payment 
+
+
+    price = getPrice();
+
+    tradeIn = getTradeIn(price);
+
+    downPayment = getDownPayment(price, tradeIn);
+
+    annualIntRate = getInterestRate();
+
+    monIntRate = annualIntRate / 12.0;
+    annualIntPercent = annualIntRate * 100.0;
+    loanAmt = price - downPayment - tradeIn;
+
+    /*Monthly payments are calculated below.	
+    The monPayment equation is used to calculate the 4 monthly payment amounts,
+	for 24, 36, 48, and 60 months. These values are stored in a two-dimensional array.*/
+    noMonths = 24;
+    monPayment[0] = calcMonPayment(noMonths, loanAmt, monIntRate);
+    noMonths = 36;
+    monPayment[1] = calcMonPayment(noMonths, loanAmt, monIntRate);
+    noMonths = 48;
+    monPayment[2] = calcMonPayment(noMonths, loanAmt, monIntRate);
+    noMonths = 60;
+    monPayment[3] = calcMonPayment(noMonths, loanAmt, monIntRate);
+
+	//The output is displayed to the user. 
+    displayLoanSchedule (price, tradeIn, downPayment, loanAmt,
+        annualIntPercent,  monPayment );
+    
+    cin.get();
+
+    return 0;
+}
